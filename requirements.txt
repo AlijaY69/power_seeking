@@ -1,0 +1,24 @@
+# Power-seeking evals: dependencies
+# Requires Python 3.10+
+#
+# Install with:   pip install -r requirements.txt
+#
+# These are minimum versions. For exact reproducibility, replace each ">="
+# line with the exact version from your own environment (see README).
+
+# --- Running the evals ---
+inspect_ai            # eval framework (tasks, solvers, scorers, log files)
+openai>=1.58.1        # client Inspect uses for OpenRouter models
+python-dotenv         # loads OPENROUTER_API_KEY from .env
+
+# --- Extracting results and statistics ---
+pandas                # log extraction, summaries, flip tables
+scipy                 # binomial, McNemar (binomtest) and Wilcoxon tests
+
+# --- Plotting ---
+plotly                # all figures
+kaleido               # saving plotly figures as PNG (fig.write_image)
+
+# --- Running the analysis notebook ---
+ipykernel             # Jupyter kernel (VS Code / Jupyter)
+nbformat              # needed for plotly figures to render inside notebooks
