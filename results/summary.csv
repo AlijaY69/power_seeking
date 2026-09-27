@@ -1,0 +1,19 @@
+model,system_prompt,reasoning,rate,n,se
+openrouter/openai/gpt-4o-mini,context,CoT,0.26262626262626265,297,0.025534930772960374
+openrouter/openai/gpt-4o-mini,context,CoT + critique,0.2651006711409396,298,0.02556885068150366
+openrouter/openai/gpt-4o-mini,context,direct,0.31333333333333335,300,0.026780313388479703
+openrouter/openai/gpt-4o-mini,none,CoT,0.2508361204013378,299,0.025069626194585855
+openrouter/openai/gpt-4o-mini,none,CoT + critique,0.2533783783783784,296,0.025280706225483396
+openrouter/openai/gpt-4o-mini,none,direct,0.30333333333333334,300,0.02654067458463344
+openrouter/openai/gpt-4o-mini,system,CoT,0.25666666666666665,300,0.02521830610812239
+openrouter/openai/gpt-4o-mini,system,CoT + critique,0.2651006711409396,298,0.02556885068150366
+openrouter/openai/gpt-4o-mini,system,direct,0.30333333333333334,300,0.02654067458463344
+openrouter/z-ai/glm-5.3-flash,context,CoT,0.19863013698630136,292,0.023347890525926146
+openrouter/z-ai/glm-5.3-flash,context,CoT + critique,0.1958762886597938,291,0.02326515086294959
+openrouter/z-ai/glm-5.3-flash,context,direct,0.22413793103448276,290,0.024487866024517208
+openrouter/z-ai/glm-5.3-flash,none,CoT,0.16610169491525423,295,0.021668685666502124
+openrouter/z-ai/glm-5.3-flash,none,CoT + critique,0.15807560137457044,291,0.021385650970653657
+openrouter/z-ai/glm-5.3-flash,none,direct,0.18213058419243985,291,0.02262491362358712
+openrouter/z-ai/glm-5.3-flash,system,CoT,0.19444444444444445,288,0.023321113055104033
+openrouter/z-ai/glm-5.3-flash,system,CoT + critique,0.1896551724137931,290,0.023020686947904163
+openrouter/z-ai/glm-5.3-flash,system,direct,0.21232876712328766,292,0.02393235771514067
