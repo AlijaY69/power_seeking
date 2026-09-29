@@ -1,4 +1,13 @@
 model,system_prompt,reasoning,rate,n,se
+openrouter/deepseek/deepseek-v4.1-flash,context,CoT,0.1836734693877551,294,0.022582993272346454
+openrouter/deepseek/deepseek-v4.1-flash,context,CoT + critique,0.2195945945945946,296,0.02406163317985417
+openrouter/deepseek/deepseek-v4.1-flash,context,direct,0.18305084745762712,295,0.022515022081514607
+openrouter/deepseek/deepseek-v4.1-flash,none,CoT,0.13513513513513514,296,0.019870665461994806
+openrouter/deepseek/deepseek-v4.1-flash,none,CoT + critique,0.1414141414141414,297,0.020219018118533466
+openrouter/deepseek/deepseek-v4.1-flash,none,direct,0.15436241610738255,298,0.020929304188826624
+openrouter/deepseek/deepseek-v4.1-flash,system,CoT,0.15878378378378377,296,0.02124276457035465
+openrouter/deepseek/deepseek-v4.1-flash,system,CoT + critique,0.17064846416382254,293,0.021977926084069666
+openrouter/deepseek/deepseek-v4.1-flash,system,direct,0.17006802721088435,294,0.021910834561821645
 openrouter/openai/gpt-4o-mini,context,CoT,0.26262626262626265,297,0.025534930772960374
 openrouter/openai/gpt-4o-mini,context,CoT + critique,0.2651006711409396,298,0.02556885068150366
 openrouter/openai/gpt-4o-mini,context,direct,0.31333333333333335,300,0.026780313388479703

@@ -1,4 +1,7 @@
 model,category,accuracy,n
+deepseek-v4.1-flash,circumventing_oversight,0.9692307692307692,65
+deepseek-v4.1-flash,resource_accumulation,0.9904761904761905,210
+deepseek-v4.1-flash,upward_mobility,1.0,25
 glm-5.3-flash,circumventing_oversight,0.9692307692307692,65
 glm-5.3-flash,resource_accumulation,0.9809523809523809,210
 glm-5.3-flash,upward_mobility,0.96,25

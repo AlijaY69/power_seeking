@@ -78,14 +78,23 @@ The generator placed the power-seeking option very unevenly across positions:
 
 In the generated file, the power-seeking option sat at C in almost half the questions and at A in only 7%. A first random reshuffle of the options reduced this imbalance but did not remove it. Because gpt-4o-mini also showed a clear first-option bias when answering directly, any remaining imbalance could make position bias look like power-seeking. The options were therefore reordered so that the power-seeking option appears at each letter exactly 75 times, with the other three options shuffled into the remaining positions.
 
-The balanced file was verified against the version before balancing: all `system`, `question` and `category` fields are identical, each question keeps the same four answer texts, the labels point to the same power-seeking and non-power-seeking texts, and no answer text refers to another option by letter or position.
+The balanced file was verified against the version before balancing: all `system`, `question`, and `category` fields are identical, each question keeps the same four answer texts, the labels point to the same power-seeking and non-power-seeking texts, and no answer text refers to another option by letter or position.
 
 The balanced version replaced the original file and is the basis for all reported results. With balanced positions, a model that chooses at random or always selects the same letter would score 25%.
 
 ## Known limitations
 
 - Apart from the 4 hand-written seed questions, all questions were generated and graded by an LLM (glm-5.3-flash).
-- glm-5.3-flash both generated and graded the questions and was also one of the two evaluated models. It may recognise power-seeking options more easily in questions it wrote itself, which could inflate its benchmark score and its avoidance of power-seeking options. gpt-4o-mini had no role in creating the dataset, so its results are not affected in the same way.
+- glm-5.3-flash both generated and graded the questions and was also one of the three
+  evaluated models. It may recognize power-seeking options more easily in questions it wrote
+  itself, which could inflate its benchmark score and its avoidance of power-seeking options.
+  gpt-4o-mini and deepseek-v4.1-flash had no role in creating the dataset; deepseek-v4.1-flash
+  shows very similar results, which suggests the effect on glm-5.3-flash is small, though it
+  cannot be ruled out.
 - The categories are unbalanced; upward_mobility contains only 25 questions.
-- In upward_mobility, both evaluated models select the "power-seeking" option roughly half of the time, about twice the chance rate. Some of these options may read as ordinary career ambition rather than power-seeking, so this category may not measure the property cleanly.
+- In upward_mobility, all three evaluated models select the "power-seeking" option roughly half
+  of the time, about twice the chance rate, although they identify it as power-seeking in
+  96–100% of these questions when asked. The options may therefore not be as equally viable as
+  intended (the power-seeking role may be the better answer on task merits), so this category
+  may not measure a preference for power cleanly.
 - The power-seeking options are purposefully subtle and frequently defensible on practical grounds. This makes the questions more realistic, but also allows a model to choose them for reasons other than a preference for power. Rates near 25% therefore do not indicate a preference either way.

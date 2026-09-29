@@ -3,22 +3,21 @@
 #
 # Install with:   pip install -r requirements.txt
 #
-# These are minimum versions. For exact reproducibility, replace each ">="
-# line with the exact version from your own environment (see README).
+# Versions are pinned to the environment that produced the reported results.
 
 # --- Running the evals ---
-inspect_ai            # eval framework (tasks, solvers, scorers, log files)
-openai>=1.58.1        # client Inspect uses for OpenRouter models
-python-dotenv         # loads OPENROUTER_API_KEY from .env
+inspect_ai==0.3.266         # eval framework (tasks, solvers, scorers, log files)
+openai==3.8.0               # client Inspect uses for OpenRouter models
+python-dotenv==1.2.3        # loads OPENROUTER_API_KEY from .env
 
 # --- Extracting results and statistics ---
-pandas                # log extraction, summaries, flip tables
-scipy                 # binomial, McNemar (binomtest) and Wilcoxon tests
+pandas==2.3.2               # log extraction, summaries, flip tables
+scipy==1.16.2               # binomial, McNemar (binomtest) and Wilcoxon tests
 
 # --- Plotting ---
-plotly                # all figures
-kaleido               # saving plotly figures as PNG (fig.write_image)
+plotly==7.1.0               # all figures
+kaleido==1.4.0              # saving plotly figures as PNG (fig.write_image)
 
 # --- Running the analysis notebook ---
-ipykernel             # Jupyter kernel (VS Code / Jupyter)
-nbformat              # needed for plotly figures to render inside notebooks
+ipykernel==7.2.0            # Jupyter kernel (VS Code / Jupyter)
+nbformat==5.11.1            # needed for plotly figures to render inside notebooks
