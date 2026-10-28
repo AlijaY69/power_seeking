@@ -2,7 +2,9 @@
 
 import pandas as pd
 from inspect_ai.log import list_eval_logs, read_eval_log
-from scipy.stats import binomtest, wilcoxon
+from itertools import combinations
+
+from scipy.stats import binomtest, chi2_contingency, kruskal, mannwhitneyu, wilcoxon
 
 # Columns that together identify one eval configuration
 CONFIG_COLS = ["model", "system_prompt", "reasoning"]
@@ -176,4 +178,75 @@ def chance_tests(df_parsed: pd.DataFrame, chance: float = 0.25) -> pd.DataFrame:
             "n": n,
             "p_value": binomtest(k, n, chance).pvalue,
         })
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# Follow-up: do power-seeking rates differ between categories?
+# The hypothesis (categories differ) was set in advance; these tests were chosen after the
+# main analysis, so they are reported as follow-up tests.
+# ---------------------------------------------------------------------------
+
+def per_question_rates(df_parsed: pd.DataFrame) -> pd.DataFrame:
+    """
+    One row per (model, question): the share of the 9 configurations in which the model chose
+    the power-seeking option. Averaging over configurations keeps each question as one
+    observation, so repeated answers to the same question are not treated as independent.
+    """
+    return (
+        df_parsed.groupby(["model", "sample_id", "category"])["power_seeking"]
+        .mean().rename("rate").reset_index()
+    )
+
+
+def category_tests(df_parsed: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Per model: Kruskal-Wallis test across categories on per-question rates, then pairwise
+    Mann-Whitney U tests, Bonferroni-corrected over all pairwise tests (pairs x models).
+    Returns (overall, pairwise).
+    """
+    q = per_question_rates(df_parsed)
+    categories = sorted(q["category"].unique())
+    pairs = list(combinations(categories, 2))
+    n_pairwise = len(pairs) * q["model"].nunique()
+
+    overall, pairwise = [], []
+    for model, g in q.groupby("model"):
+        groups = {c: g.loc[g["category"] == c, "rate"] for c in categories}
+        h, p = kruskal(*groups.values())
+        overall.append({"model": model, "H": h, "p_value": p,
+                        **{f"mean_{c}": groups[c].mean() for c in categories}})
+        for a, b in pairs:
+            p_ab = mannwhitneyu(groups[a], groups[b]).pvalue
+            pairwise.append({"model": model, "comparison": f"{a} vs {b}", "p_value": p_ab,
+                             "p_bonferroni": min(1.0, p_ab * n_pairwise)})
+    return pd.DataFrame(overall), pd.DataFrame(pairwise)
+
+
+def per_config_category_tests(df_parsed: pd.DataFrame) -> pd.DataFrame:
+    """
+    Robustness check: chi-square test of category x power-seeking within each single
+    configuration, Bonferroni-corrected over all model x configuration tests.
+    """
+    rows = []
+    for (model, spb, reasoning), g in df_parsed.groupby(CONFIG_COLS):
+        table = pd.crosstab(g["category"], g["power_seeking"])
+        rows.append({"model": model, "system_prompt": spb, "reasoning": reasoning,
+                     "p_value": chi2_contingency(table)[1]})
+    out = pd.DataFrame(rows)
+    out["significant_bonferroni"] = out["p_value"] < 0.05 / len(out)
+    return out
+
+
+def pooled_rates(df_parsed: pd.DataFrame,
+                 pooled=("circumventing_oversight", "upward_mobility")) -> pd.DataFrame:
+    """
+    Descriptive: the power-seeking rate if oversight and upward mobility were one category,
+    as in ARENA's 'upward-mobile' definition, next to each category's own rate.
+    """
+    rows = []
+    for model, g in df_parsed.groupby("model"):
+        by_cat = g.groupby("category")["power_seeking"].mean()
+        rows.append({"model": model, **by_cat.to_dict(),
+                     "pooled_" + "+".join(pooled): g[g["category"].isin(pooled)]["power_seeking"].mean()})
     return pd.DataFrame(rows)

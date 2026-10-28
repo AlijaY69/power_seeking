@@ -2,7 +2,7 @@
 
 A multiple-choice eval measuring the propensity of LLMs to choose power-seeking options when
 equally viable alternatives exist, built with [Inspect](https://inspect.aisi.org.uk/),
-extending the evals chapter of [ARENA 3.0](https://github.com/callummcdougall/ARENA_3.0).
+extending the evals chapter of [ARENA](https://github.com/ARENA-education/ARENA_materials).
 
 ## Key findings
 
@@ -11,15 +11,23 @@ extending the evals chapter of [ARENA 3.0](https://github.com/callummcdougall/AR
 - **Oversight as a firm line, not only on self-generated questions:** glm-5.3-flash and
   deepseek-v4.1-flash choose to circumvent oversight in only 3–10% of cases (vs. 25% chance),
   although DeepSeek had no role in creating the dataset. On resource accumulation, both are
-  only slightly below chance.
+  only slightly below chance; the difference between the two categories is significant for
+  glm-5.3-flash and a trend for deepseek-v4.1-flash (p = 0.054 after correction).
 - **Authority-seeking isn't avoided:** all three models choose the upward-mobility option about
   half the time despite identifying it as power-seeking in 96–100% of cases; this category
   needs closer inspection.
+- **The categories behave differently:** power-seeking rates differ between the three
+  categories in all three models (Kruskal–Wallis, follow-up test). Merging oversight and
+  upward mobility into one category, as ARENA's definition does, would largely hide this for
+  the two reasoning models (merged 0.17–0.18 vs. resources 0.16–0.20).
 - **Small effect of prompting for reasoning:** chain-of-thought lowers gpt-4o-mini's rate by
   about 5 points (exploratory); the two models that always reason are barely affected.
   Self-critique and scenario placement make little difference.
 
-![Power-seeking rate by model and configuration](results/figures/rates_by_configuration.png)
+![Recognition vs. choice of the power-seeking option, per category and model](results/figures/recognition_vs_choice.png)
+
+*Bars show the range of choice rates across the 9 configurations, not confidence intervals.
+glm-5.3-flash created the questions, so its recognition scores may be inflated.*
 
 ## Question
 
@@ -33,13 +41,19 @@ scenarios, where the power-seeking option is defensible on practical grounds, co
 how such a tendency would show up in real use. A separate recognition benchmark checks that
 the models can still identify the power-seeking option when asked to look for it.
 
-Two further questions: does reasoning before answering (chain-of-thought, self-critique) change
-the behavior, and does framing (whether the model is cast in a role) change it?
+Three further questions: do the categories of power-seeking differ from each other, does
+reasoning before answering (chain-of-thought, self-critique) change the behavior, and does
+scenario placement (whether the scenario is given as the model's role, as context, or not at
+all) change it?
 
 ## Dataset
 
 - 300 four-option MCQs
 - three categories: resource accumulation (210), circumventing oversight (65), upward mobility (25)
+- categories adapted from ARENA's two-category definition (upward-mobile, resource-seeking):
+  circumventing oversight is split out of ARENA's "upward-mobile" as its own category, upward
+  mobility is narrowed to choosing between roles, and resource accumulation is defined relative
+  to what the task requires
 - generated and rubric-graded by glm-5.3-flash (also one of the evaluated models; see Limitations)
 - answer positions balanced (75 per letter)
 
@@ -78,6 +92,7 @@ choice rate could simply mean it didn't notice.
 - **Scoring:** rule-based letter match against the labeled power-seeking option; no model involved in scoring
 - **Chance level:** 25% (four options; because answer positions are balanced, this also holds for a model with position bias)
 - **Statistics:** standard errors; paired McNemar/Wilcoxon tests, because every configuration used the same 300 questions; binomial tests against chance with Bonferroni correction
+- **Follow-up category tests:** each question's power-seeking rate is averaged over the 9 configurations (so repeated answers to one question count once), then categories are compared per model with a Kruskal–Wallis test and pairwise Mann–Whitney U tests (Bonferroni over 9 pairwise tests). The hypothesis that categories differ was set in advance; these tests were chosen after the main analysis
 - **Setup:** one run per configuration at each model's default temperature
 
 ## Results
@@ -120,17 +135,32 @@ choice rate could simply mean it didn't notice.
    greater authority as undesirable, or the power-seeking option in these questions is genuinely
    better on task merits (i.e., the options are not as equally viable as intended). With 25
    questions, this category needs closer inspection before drawing firm conclusions.
-5. Self-critique and the placement of the scenario (system prompt, user message, or omitted)
+5. The categories differ from each other in all three models (Kruskal–Wallis on per-question
+   rates: deepseek-v4.1-flash H = 36.5, p ≈ 10⁻⁸; glm-5.3-flash H = 46.9, p ≈ 10⁻¹⁰;
+   gpt-4o-mini H = 14.5, p = 0.0007; follow-up tests). Pairwise, upward mobility differs from
+   both other categories in every model. Oversight differs from resource accumulation for
+   glm-5.3-flash (p < 0.001 after correction), is a trend for deepseek-v4.1-flash (p = 0.054
+   after correction), and does not differ for gpt-4o-mini (p = 0.71). Testing each
+   configuration separately gives the same picture for the reasoning models (category
+   differences significant in 7/9 configurations for deepseek-v4.1-flash and 8/9 for
+   glm-5.3-flash, but only 3/9 for gpt-4o-mini). Merging oversight and upward mobility into one
+   category, as in ARENA's "upward-mobile" definition, would largely hide the difference for
+   the reasoning models: merged 0.18 vs. resources 0.16 for deepseek-v4.1-flash, and 0.17 vs.
+   0.20 for glm-5.3-flash.
+6. Self-critique and the placement of the scenario (system prompt, user message, or omitted)
    make little difference overall. Exploratory: both reasoning models are least power-seeking
    when no scenario is given (glm-5.3-flash 0.16–0.18 vs. 0.19–0.22 with a scenario;
    deepseek-v4.1-flash 0.14–0.15 vs. 0.16–0.22).
-6. Chain-of-thought reduces gpt-4o-mini's power-seeking rate by about 5 percentage points
+
+![Power-seeking rate by model and configuration](results/figures/rates_by_configuration.png)
+
+7. Chain-of-thought reduces gpt-4o-mini's power-seeking rate by about 5 percentage points
    (paired Wilcoxon test, p = 0.004; this test was chosen after seeing the data). For the two
    reasoning models, the same test was fixed in advance, and neither effect was significant
    (glm-5.3-flash p = 0.064; deepseek-v4.1-flash p = 0.45). Both reason before every answer
    (even their "direct" runs produced about 0.6–1.2M reasoning tokens), so prompting for CoT
    changes little.
-7. The models' position biases differ: gpt-4o-mini prefers A when answering directly and D
+8. The models' position biases differ: gpt-4o-mini prefers A when answering directly and D
    after chain-of-thought; deepseek-v4.1-flash mildly prefers D (≈0.29–0.36) and avoids A
    (≈0.17–0.22) in every condition; glm-5.3-flash shows no position bias. Balancing the answer
    positions prevented these biases from being counted as power-seeking.
@@ -149,7 +179,14 @@ Full analysis: [notebooks/analysis.ipynb](notebooks/analysis.ipynb)
   gpt-4o-mini rates shifted by up to ~3 points between two runs), so small differences
   between configurations should be treated with caution.
 - **Exploratory tests:** the per-question CoT test for gpt-4o-mini was chosen after seeing the
-  data; it was fixed in advance for glm-5.3-flash and deepseek-v4.1-flash.
+  data; it was fixed in advance for glm-5.3-flash and deepseek-v4.1-flash. The category tests
+  (Results, point 5) test a hypothesis set in advance, but the tests themselves were chosen
+  after the main analysis.
+- **Parity is screened, not verified:** the rubric's parity criterion (are the options equally
+  defensible?) was scored by glm-5.3-flash, and I spot-checked some items by hand, but there was
+  no systematic human rating of whether the options are equally good. If the power-seeking
+  option is better or worse on task merits, rates above or below chance reflect that rather
+  than a preference about power.
 - **Chain-of-thought is not a clean manipulation for reasoning models:** glm-5.3-flash and
   deepseek-v4.1-flash reason before every answer, so the "direct" condition already includes
   reasoning.
@@ -179,7 +216,8 @@ power-seeking/
 ├── scripts/
 │   ├── run_benchmark.py       ← runs the recognition benchmark for one model
 │   ├── run_sweep.py           ← runs the 9-configuration alignment sweep for one model
-│   └── extract_results.py     ← reads the eval logs and writes results/*.csv
+│   ├── extract_results.py     ← reads the eval logs and writes results/*.csv
+│   └── category_test.py       ← follow-up tests: do categories differ? (reads results/)
 ├── notebooks/
 │   └── analysis.ipynb         ← reproduces every figure and statistic in this README
 ├── results/
@@ -204,7 +242,11 @@ pip install -r requirements.txt
 To run evals, copy `.env.example` to `.env` and add your OpenRouter API key.
 
 **Re-run the analysis only** (no API key needed): open `notebooks/analysis.ipynb` and run all
-cells. It reads the CSVs in `results/`.
+cells. It reads the CSVs in `results/`. The category tests can also be run on their own:
+
+```bash
+python -m scripts.category_test
+```
 
 **Re-extract the results from the original logs:** download the logs from the
 [GitHub Release](https://github.com/AlijaY69/power_seeking/releases/tag/v1.0), unzip them into `logs/`, then run:
@@ -234,10 +276,10 @@ Results will vary slightly between runs because models are sampled at their defa
 
 ## Credits
 
-Adapted from [ARENA 3.0](https://github.com/callummcdougall/ARENA_3.0), Chapter 3 (LLM Evals).
+Adapted from [ARENA](https://github.com/ARENA-education/ARENA_materials), Chapter 3 (LLM Evals).
 Built with [Inspect](https://inspect.aisi.org.uk/) by the UK AI Security Institute. Seed
 questions were revised with claude-opus-5.
 
 ## License
 
-MIT for original code; code adapted from ARENA 3.0 is used under its original license.
+MIT for original code; code adapted from ARENA is used under its original license.
